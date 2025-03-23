@@ -1,12 +1,14 @@
 import pandas as pd
+import numpy as np
 import streamlit as st
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
+import joblib
 
 # Load dataset
-df = pd.read_csv('C:/Users/M.V.Vindhya/OneDrive/Desktop/CHATBOT/heart_2020_cleaned.csv')
+df = pd.read_csv('heart_2020_cleaned.csv')
 
 # Encode categorical variables
 label_encoders = {}
@@ -24,6 +26,16 @@ scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 model = RandomForestClassifier(n_estimators=100, random_state=42)
 model.fit(X_scaled, y)
+
+# Save model and scalers
+joblib.dump(model, "heart_disease_model.pkl")
+joblib.dump(scaler, "scaler.pkl")
+joblib.dump(label_encoders, "label_encoders.pkl")
+
+# Load saved models
+model = joblib.load("heart_disease_model.pkl")
+scaler = joblib.load("scaler.pkl")
+label_encoders = joblib.load("label_encoders.pkl")
 
 # Streamlit UI
 st.title('Heart Disease Prediction')
@@ -51,4 +63,4 @@ if st.button('Predict'):
     # Make prediction
     prediction = model.predict(input_scaled)
     result = 'Yes' if prediction[0] == 1 else 'No'
-    st.write(f'Prediction: Heart Disease - {result}')
+    st.write(f'Prediction: Heart Disease - {result}')
